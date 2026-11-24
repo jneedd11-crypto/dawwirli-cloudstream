@@ -87,7 +87,7 @@ class DawwirliProvider : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse? {
-        val p = url.split("|")
+                val p = url.removePrefix(mainUrl).trimStart('/').split("|")
         val kind = p.getOrNull(0) ?: return null
         val id = p.getOrNull(1) ?: return null
 

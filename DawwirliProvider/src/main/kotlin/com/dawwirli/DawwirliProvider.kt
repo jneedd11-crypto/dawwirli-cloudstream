@@ -87,7 +87,7 @@ class DawwirliProvider : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse? {
-                val p = url.removePrefix(mainUrl).trimStart('/').split("|")
+        val p = url.removePrefix(mainUrl).trimStart('/').split("|")
         val kind = p.getOrNull(0) ?: return null
         val id = p.getOrNull(1) ?: return null
 
@@ -148,18 +148,39 @@ class DawwirliProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-                val p = data.removePrefix(mainUrl).trimStart('/').split("|")
-        val kind = p.getOrNull(0) ?: return false
+        val p = data.removePrefix(mainUrl).trimStart('/').split("|")
+        val kind = p.getOrNull(0)?.takeIf { it == "series" || it == "movie" } ?: return false
         val id = p.getOrNull(1) ?: return false
-        val ext = p.getOrNull(2).orEmpty().ifBlank { "mp4" }
+        val ext = p.getOrNull(2).orEmpty().ifBlank { "mp4" }.lowercase()
+        val isMp4 = ext == "mp4" || ext == "m4v"
+        val q = "kind=$kind&id=${enc(id)}&ext=${enc(ext)}"
 
-        val url = "$mainUrl/vod?kind=$kind&id=${enc(id)}&ext=${enc(ext)}"
-        callback(
-            newExtractorLink(name, name, url, ExtractorLinkType.VIDEO) {
-                this.referer = mainUrl
-                this.quality = Qualities.Unknown.value
-            }
-        )
+        suspend fun add(label: String, url: String, type: ExtractorLinkType) {
+            callback(
+                newExtractorLink(name, "$name • $label", url, type) {
+                    this.referer = mainUrl
+                    this.quality = Qualities.Unknown.value
+                }
+            )
+        }
+
+        // 1) نسخة mp4 بديلة جاهزة لنفس العمل (إن وُجدت) — أسرع خيار
+        val alt = getJson("/api/altsource?$q")?.optJSONObject("alt")
+        val altId = alt?.optString("id").orEmpty()
+        if (alt != null && altId.isNotBlank()) {
+            val altExt = alt.optString("ext").ifBlank { "mp4" }
+            add("mp4 بديل", "$mainUrl/vod?kind=$kind&id=${enc(altId)}&ext=${enc(altExt)}", ExtractorLinkType.VIDEO)
+        }
+
+        // 2) الرابط المباشر (mp4) أو النسخة المخزّنة (غير mp4)
+        if (isMp4) {
+            add("mp4", "$mainUrl/vod?$q", ExtractorLinkType.VIDEO)
+        } else {
+            add("مخزّن $ext", "$mainUrl/vodx?$q", ExtractorLinkType.VIDEO)
+        }
+
+        // 3) بثّ HLS يحوّله الخادم (نفس ما يستخدمه مشغّل الموقع لملفات mkv)
+        add("HLS", "$mainUrl/hlsvod/${kind}_${id}_$ext/master.m3u8", ExtractorLinkType.M3U8)
         return true
     }
 }

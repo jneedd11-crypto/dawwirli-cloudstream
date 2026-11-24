@@ -1,4 +1,4 @@
-version = 2a
+version = 3
 
 cloudstream {
     description = "أفلام ومسلسلات من دورلي"

@@ -40,6 +40,7 @@ subprojects {
     }
 
     android {
+        namespace = "com.dawwirli"
         compileSdkVersion(35)
         defaultConfig {
             minSdk = 21

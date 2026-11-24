@@ -148,7 +148,7 @@ class DawwirliProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val p = data.split("|")
+                val p = data.removePrefix(mainUrl).trimStart('/').split("|")
         val kind = p.getOrNull(0) ?: return false
         val id = p.getOrNull(1) ?: return false
         val ext = p.getOrNull(2).orEmpty().ifBlank { "mp4" }

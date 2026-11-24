@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.9
+
+      - name: Build plugin
+        run: gradle make makePluginsJson
+
+      - name: Publish to builds branch
+        run: |
+          mkdir -p /tmp/out
+          find . -name '*.cs3' -exec cp {} /tmp/out/ \;
+          cp build/plugins.json /tmp/out/
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan builds
+          git rm -rf . > /dev/null
+          cp /tmp/out/* .
+          git add .
+          git commit -m "Build $GITHUB_SHA"
+          git push -f origin builds

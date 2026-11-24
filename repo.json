@@ -1,0 +1,8 @@
+{
+  "name": "Dawwirli",
+  "description": "إضافة دورلي لـ CloudStream",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/jneedd11-crypto/dawwirli-cloudstream/builds/plugins.json"
+  ]
+}

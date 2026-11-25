@@ -176,7 +176,7 @@ class DawwirliProvider : MainAPI() {
         if (isMp4) {
             add("mp4", "$mainUrl/vod?$q", ExtractorLinkType.VIDEO)
         } else {
-            add("مخزّن $ext", "$mainUrl/vodx?$q", ExtractorLinkType.VIDEO)
+                        add("أصلي $ext", "$mainUrl/raw?$q", ExtractorLinkType.VIDEO)
         }
 
         // 3) بثّ HLS يحوّله الخادم (نفس ما يستخدمه مشغّل الموقع لملفات mkv)

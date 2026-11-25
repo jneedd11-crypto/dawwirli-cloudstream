@@ -1,0 +1,14 @@
+{
+    "fileHash": "sha256-c0b676d87e1af0f7d1df5a4c26688fbc49ab83598a866af9c83ed9d90726ca43",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/jneedd11-crypto/dawwirli-cloudstream",
+    "fileSize": 18674,
+    "status": 3,
+    "authors": [
+        
+    ],
+    "version": -1,
+    "internalName": "DawwirliProvider",
+    "url": "https://raw.githubusercontent.com/jneedd11-crypto/dawwirli-cloudstream/builds/DawwirliProvider.cs3",
+    "name": "DawwirliProvider"
+}
